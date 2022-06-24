@@ -11,12 +11,15 @@ import org.testng.annotations.Test;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 public class TestElements extends BaseTest {
     @BeforeMethod
     public void pageSetUp () {
         driver.manage().window().maximize();
+        //driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);   //kao osiguranje da ce svi testovi biti izvrseni do kraja, da nece pucati pre samog izvrsenja - 2 opcija
         driver.get("https://demoqa.com/elements");
+        wdwait.until(ExpectedConditions.urlToBe("https://demoqa.com/elements"));    //kao osiguranje da ce svi testovi biti izvrseni do kraja, da nece pucati pre samog izvrsenja - 1 opcija
     }
 
     @AfterMethod
@@ -368,40 +371,40 @@ public class TestElements extends BaseTest {
         sidebarPage.clickOnLinksTab();
         Assert.assertTrue(linksPage.getPageHeading().isDisplayed());
 
+        //waitUntilElementisClickable(linksPage.getCreatedLink());
         linksPage.clickOnCreatedLink();
-        Thread.sleep(2500);
-        Assert.assertTrue(linksPage.getNotificationMessage().getText().contains("201"));
-        Assert.assertTrue(linksPage.getNotificationMessage().getText().contains("Created"));
+        wdwait.until(ExpectedConditions.textToBe(By.id("linkResponse"),"Link has responded with staus 201 and status text Created"));
+        Assert.assertTrue(linksPage.getNotificationMessage().getText().equalsIgnoreCase("Link has responded with staus 201 and status text Created"));
 
+        //waitUntilElementisClickable(linksPage.getNoContentLink());
         linksPage.clickOnNoContentLink();
-        Thread.sleep(2500);
-        Assert.assertTrue(linksPage.getNotificationMessage().getText().contains("204"));
-        Assert.assertTrue(linksPage.getNotificationMessage().getText().contains("No Content"));
+        wdwait.until(ExpectedConditions.textToBe(By.id("linkResponse"),"Link has responded with staus 204 and status text No Content"));
+        Assert.assertTrue(linksPage.getNotificationMessage().getText().equalsIgnoreCase("Link has responded with staus 204 and status text No Content"));
 
+        //waitUntilElementisClickable(linksPage.getMovedLink());
         linksPage.clickOnMovedLink();
-        Thread.sleep(2500);
-        Assert.assertTrue(linksPage.getNotificationMessage().getText().contains("301"));
-        Assert.assertTrue(linksPage.getNotificationMessage().getText().contains("Moved Permanently"));
+        wdwait.until(ExpectedConditions.textToBe(By.id("linkResponse"),"Link has responded with staus 301 and status text Moved Permanently"));
+        Assert.assertTrue(linksPage.getNotificationMessage().getText().contains("Link has responded with staus 301 and status text Moved Permanently"));
 
+        //waitUntilElementisClickable(linksPage.getBadRequestLink());
         linksPage.clickOnBadRequestLink();
-        Thread.sleep(2500);
-        Assert.assertTrue(linksPage.getNotificationMessage().getText().contains("400"));
-        Assert.assertTrue(linksPage.getNotificationMessage().getText().contains("Bad Request"));
+        wdwait.until(ExpectedConditions.textToBe(By.id("linkResponse"),"Link has responded with staus 400 and status text Bad Request"));
+        Assert.assertTrue(linksPage.getNotificationMessage().getText().contains("Link has responded with staus 400 and status text Bad Request"));
 
+        //waitUntilElementisClickable(linksPage.getUnauthorizedLink());
         linksPage.clickOnUnauthorizedLink();
-        Thread.sleep(2500);
-        Assert.assertTrue(linksPage.getNotificationMessage().getText().contains("401"));
-        Assert.assertTrue(linksPage.getNotificationMessage().getText().contains("Unauthorized"));
+        wdwait.until(ExpectedConditions.textToBe(By.id("linkResponse"),"Link has responded with staus 401 and status text Unauthorized"));
+        Assert.assertTrue(linksPage.getNotificationMessage().getText().contains("Link has responded with staus 401 and status text Unauthorized"));
 
+        //waitUntilElementisClickable(linksPage.getForbiddenLink());
         linksPage.clickOnForbiddenLink();
-        Thread.sleep(2500);
-        Assert.assertTrue(linksPage.getNotificationMessage().getText().contains("403"));
-        Assert.assertTrue(linksPage.getNotificationMessage().getText().contains("Forbidden"));
+        wdwait.until(ExpectedConditions.textToBe(By.id("linkResponse"),"Link has responded with staus 403 and status text Forbidden"));
+        Assert.assertTrue(linksPage.getNotificationMessage().getText().contains("Link has responded with staus 403 and status text Forbidden"));
 
+        //waitUntilElementisClickable(linksPage.getNotFoundLink());
         linksPage.clickOnNotFoundLink();
-        Thread.sleep(2500);
-        Assert.assertTrue(linksPage.getNotificationMessage().getText().contains("404"));
-        Assert.assertTrue(linksPage.getNotificationMessage().getText().contains("Not Found"));
+        wdwait.until(ExpectedConditions.textToBe(By.id("linkResponse"),"Link has responded with staus 404 and status text Not Found"));
+        Assert.assertTrue(linksPage.getNotificationMessage().getText().contains("Link has responded with staus 404 and status text Not Found"));
     }
     //------------------------------------------------------------------------------------------------Broken Links tests
     @Test (priority = 150, description = "Verify that valid and broken images are present on web page")
@@ -426,6 +429,7 @@ public class TestElements extends BaseTest {
         driver.navigate().back();
         Thread.sleep(2000);
         brokenLinks_imagesPage.clickOnBrokenLink();
+        wdwait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div/h3")));
         Assert.assertEquals(driver.getCurrentUrl(),brokenPageUrl);
     }
     //-----------------------------------------------------------------------------------------Upload and Download tests

@@ -1,20 +1,26 @@
 package Test;
 
 import Base.BaseTest;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class TestWidgets extends BaseTest {
     @BeforeMethod
     public void pageSetUp () {
         driver.manage().window().maximize();
+        //driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);  //kao osiguranje da ce svi testovi biti izvrseni do kraja, da nece pucati pre samog izvrsenja - 2 opcija
         driver.get("https://demoqa.com/widgets");
+        wdwait.until(ExpectedConditions.urlToBe("https://demoqa.com/widgets")); //kao osiguranje da ce svi testovi biti izvrseni do kraja, da nece pucati pre samog izvrsenja - 1 opcija
+
     }
     @AfterMethod
     public void deleteAllCookies () {
@@ -93,7 +99,6 @@ public class TestWidgets extends BaseTest {
         Assert.assertFalse(checkMultyColorTextbox);    //dokaz da je druga boja obrisana
         Assert.assertTrue(autoCompletePage.getListMultyColorNames().get(0).isDisplayed());
     }
-
     @Test (priority = 30, description = "add color in single color field")
     public void addColorInSingleColorTextbox () throws InterruptedException {
         scrollIntoView(sidebarPage.getWidgetsTab());
@@ -107,9 +112,102 @@ public class TestWidgets extends BaseTest {
         Assert.assertEquals(autoCompletePage.getSingleColorName().getText(),"Yellow");  //dokaz da smo sa y pregazili prethodni unos i sada je seletovana boja "Yellow"
     }
     //-------------------------------------------------------------------------------------------------Date Picker tests
+    @Test (priority = 40,description = "Verify that user can successfully pick a date with regular clicking")
+    public void selectDate () throws InterruptedException {
+        int day = 30;                        //korisnik bira dan
+        String yearString = "2000";         //korisnik bira mesec
+        String monthString = "July";   //korisnik bira godinu
+        scrollIntoView(sidebarPage.getDatePickerTab());
+        waitUntilElementisClickable(sidebarPage.getDatePickerTab());
+        sidebarPage.clickOnDatePickerTab();
+        scrollIntoView(datePickerPage.getPageHeading());
+        datePickerPage.clickOnSelectDateTextbox();
+        wdwait.until(ExpectedConditions.visibilityOfElementLocated(By.className("react-datepicker__year-select")));
+        Select monthSelect = new Select(datePickerPage.getSelectMonthField());
+        monthSelect.selectByVisibleText(monthString);
+        Select yearSelect = new Select(datePickerPage.getSelectYearField());
+        yearSelect.selectByValue(yearString);
 
-    //URADITI DATE PICKER TESTOVE
+        boolean numberGreaterThan15 = day > 15;
 
+        if (numberGreaterThan15 == false) {
+            for (int i = 0; i < datePickerPage.getListOfDays().size()-1;i++) {
+                if (datePickerPage.getListOfDays().get(i).getText().equals(String.valueOf(day))){
+                    datePickerPage.getListOfDays().get(i).click();
+                }
+            }
+        } else {
+            for (int i = datePickerPage.getListOfDays().size()-1; i >=0 ;i--) {
+                if (datePickerPage.getListOfDays().get(i).getText().equals(String.valueOf(day))){
+                    datePickerPage.getListOfDays().get(i).click();
+                    break;
+                }
+            }
+        }
+
+        String checkDay;
+        if (day<10) {
+            checkDay = "0" + String.valueOf(day);
+        } else {
+            checkDay = String.valueOf(day);
+        }
+
+        int checkMonth = 0;
+        switch (monthString) {
+            case "January": checkMonth = 1;
+            break;
+            case "February": checkMonth = 2;
+                break;
+            case "March": checkMonth = 3;
+                break;
+            case "April": checkMonth = 4;
+                break;
+            case "May": checkMonth = 5;
+                break;
+            case "June": checkMonth = 6;
+                break;
+            case "July": checkMonth = 7;
+                break;
+            case "August": checkMonth = 8;
+                break;
+            case "September": checkMonth = 9;
+                break;
+            case "October": checkMonth = 10;
+                break;
+            case "November": checkMonth = 11;
+                break;
+            case "December": checkMonth = 12;
+                break;
+        }
+        String checkMonthString;
+        if (checkMonth < 10) {
+            checkMonthString = "0"+String.valueOf(checkMonth);
+        } else {
+            checkMonthString = String.valueOf(checkMonth);
+        }
+
+        Assert.assertEquals(datePickerPage.getSelectDateTextbox().getAttribute("value"), checkMonthString+"/"+checkDay+"/"+yearString);
+    }
+    @Test (priority = 50,description = "Verify that user can successfully pick a date and time")
+    public void selectDateAndTime () throws InterruptedException {
+        scrollIntoView(sidebarPage.getDatePickerTab());
+        waitUntilElementisClickable(sidebarPage.getDatePickerTab());
+        sidebarPage.clickOnDatePickerTab();
+        scrollIntoView(datePickerPage.getPageHeading());
+
+        datePickerPage.clickOnDateAndTimeTextbox();
+        waitUntilElementisClickable(datePickerPage.getSelectYearField2());
+        datePickerPage.getSelectYearField2().click();
+        datePickerPage.clickOnYear2("1995");
+        waitUntilElementisClickable(datePickerPage.getSelectMonthField2());
+        datePickerPage.getSelectMonthField2().click();
+        datePickerPage.clickOnMonth2(10);
+        datePickerPage.clickOnDay("20");
+        Thread.sleep(1000);
+        datePickerPage.clickOnTimeElement("10:15");
+        Assert.assertEquals(datePickerPage.getDateAndTimeTextbox().getAttribute("value"), "October 20, 1995 10:15 AM");
+
+    }
     //------------------------------------------------------------------------------------------------------Slider tests
     @Test (priority = 60, description = "Verify that user can move slider forward and backward")
     public void moveSlidebarBackwardAndForward () {
@@ -204,7 +302,6 @@ public class TestWidgets extends BaseTest {
         selectMenuPage.enterCharactersInSelectOneField("d");
         Assert.assertTrue(selectMenuPage.getSelectOneFieldValue().getText().equalsIgnoreCase("Dr."));
     }
-
     @Test (priority = 110, description = "Verify that user can select multi values from dropdown menu")
     public void selectMultiValuesFromMultiselectDropdown () throws InterruptedException {
         scrollIntoView(sidebarPage.getWidgetsTab());
@@ -233,7 +330,6 @@ public class TestWidgets extends BaseTest {
         Assert.assertFalse(selectMenuPage.getMultiSelectDropDownFieldValue().getText().contains("Blue"));
         Assert.assertFalse(selectMenuPage.getMultiSelectDropDownFieldValue().getText().contains("Black"));
     }
-
     @Test (priority = 120, description = "Verify that user can select value from dropdown menu")
     public void selectSingleValueFromOldStyleSelectMenu () {
         scrollIntoView(sidebarPage.getWidgetsTab());
@@ -246,7 +342,6 @@ public class TestWidgets extends BaseTest {
         String selectedColor = color.getFirstSelectedOption().getText();
         Assert.assertEquals(selectedColor, "Aqua");
     }
-
     @Test (priority = 130, description = "Verify that user can select multi values from dropdown menu")
     public void selectMultiValueFromStandardSelectMenu () {
         scrollIntoView(sidebarPage.getWidgetsTab());
