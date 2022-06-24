@@ -17,9 +17,9 @@ public class TestWidgets extends BaseTest {
     @BeforeMethod
     public void pageSetUp () {
         driver.manage().window().maximize();
-        //driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);  //kao osiguranje da ce svi testovi biti izvrseni do kraja, da nece pucati pre samog izvrsenja - 2 opcija
+        driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);  //kao osiguranje da ce svi testovi biti izvrseni do kraja, da nece pucati pre samog izvrsenja - 2 opcija
         driver.get("https://demoqa.com/widgets");
-        wdwait.until(ExpectedConditions.urlToBe("https://demoqa.com/widgets")); //kao osiguranje da ce svi testovi biti izvrseni do kraja, da nece pucati pre samog izvrsenja - 1 opcija
+        //wdwait.until(ExpectedConditions.urlToBe("https://demoqa.com/widgets")); //kao osiguranje da ce svi testovi biti izvrseni do kraja, da nece pucati pre samog izvrsenja - 1 opcija
 
     }
     @AfterMethod

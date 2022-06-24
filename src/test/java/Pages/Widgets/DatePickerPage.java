@@ -90,7 +90,6 @@ public class DatePickerPage {
     //------------------------------------------------------------------
     public void clickOnTimeElement (String time) {
         driver.findElement(By.xpath("//li[text()='"+time+"']")).click();
-        //li[text()='00:15']
     }
 
 }
